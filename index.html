@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Pendeteksi Kebisingan Kampus - Ultra Modern</title>
+    <!-- Link ke CSS Framework (Bootstrap 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Link ke Chart.js untuk grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Link ke Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Link ke file CSS kustom Anda -->
+    <style>
+      /* Definisi warna kustom yang diperbarui untuk tampilan yang lebih modern */
+      :root {
+        --primary-dark: #1a202c; /* Hampir hitam, untuk latar belakang gelap atau teks utama */
+        --primary-light: #f0f4f8; /* Latar belakang terang yang lembut */
+        --accent-blue: #4a90e2; /* Biru cerah sebagai aksen utama */
+        --accent-green: #5cb85c; /* Hijau untuk sukses/normal */
+        --accent-orange: #f0ad4e; /* Oranye untuk peringatan */
+        --accent-red: #d9534f; /* Merah untuk alert/bahaya */
+        --text-dark: #2d3748; /* Teks gelap */
+        --text-light: #e2e8f0; /* Teks terang */
+        --border-light: #cbd5e0; /* Border yang sangat lembut */
+        --card-bg: #ffffff; /* Latar belakang kartu */
+        --gradient-start: #4a90e2; /* Awal gradien */
+        --gradient-end: #8e44ad; /* Akhir gradien */
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, var(--primary-light) 0%, #e0e7ef 100%); /* Gradien latar belakang lembut */
+        color: var(--text-dark);
+        line-height: 1.7;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Navbar */
+      .navbar {
+        background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%) !important; /* Gradien pada navbar */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Bayangan lebih kuat */
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(10px); /* Efek glassmorphism ringan */
+        background-color: rgba(74, 144, 226, 0.8); /* Fallback untuk browser tanpa backdrop-filter */
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: var(--white) !important;
+        letter-spacing: 0.8px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .nav-link {
+        color: var(--text-light) !important; /* Teks lebih terang */
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animasi lebih halus */
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px; /* Sudut lebih membulat */
+        margin: 0 5px;
+        position: relative;
+        overflow: hidden;
+      }
+      .nav-link:hover {
+        color: var(--white) !important;
+        background-color: rgba(255, 255, 255, 0.15); /* Latar belakang transparan saat hover */
+        transform: translateY(-2px); /* Efek naik sedikit */
+      }
+      .nav-link.active {
+        font-weight: 600;
+        color: var(--white) !important;
+        background-color: rgba(255, 255, 255, 0.25); /* Latar belakang lebih menonjol untuk aktif */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transform: translateY(-1px);
+      }
+      /* Styling untuk navigasi yang dinonaktifkan */
+      .disabled-nav .nav-item .nav-link {
+        pointer-events: none;
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      /* --- MODIFIKASI UNTUK MENU HAMBURGER MODERN --- */
+      .navbar-toggler {
+        border: none;
+        padding: 0.25rem 0.75rem;
+        font-size: 1.25rem;
+        line-height: 1;
+        background-color: transparent;
+        border-radius: 0.25rem;
+        transition: box-shadow 0.15s ease-in-out;
+      }
+      .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+      }
+
+      .navbar-toggler-icon {
+        display: inline-block;
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: middle;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100%;
+        transition: all 0.3s ease-in-out; /* Animasi untuk ikon */
+      }
+
+      /* Modern Hamburger Icon (X-shape on open) */
+      .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 2l12 12M14 2L2 14'/%3e%3csvg%3e") !important;
+      }
+      .navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3csvg%3e") !important;
+      }
+
+      /* Pastikan navbar-collapse terlihat di desktop setelah login */
+      .navbar-collapse.show,
+      .navbar-collapse.collapsing {
+        display: block !important; /* Override d-none untuk animasi collapse */
+      }
+      @media (min-width: 992px) {
+        /* Bootstrap's 'lg' breakpoint */
+        .navbar-collapse:not(.show) {
+          display: flex !important; /* Pastikan menu terlihat di desktop saat tidak di-collapse */
+        }
+      }
+
+      @media (max-width: 991.98px) {
+        .navbar-nav {
+          background: linear-gradient(180deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+          padding: 1.5rem;
+          border-radius: 12px;
+          margin-top: 1rem;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          transform: translateY(10px); /* Sedikit efek slide-down */
+          opacity: 0;
+          transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+        }
+        .navbar-collapse.show .navbar-nav {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        .nav-link {
+          color: var(--text-light) !important;
+          margin-bottom: 0.5rem; /* Spasi antar item menu */
+        }
+        .nav-link.active {
+          color: var(--primary-dark) !important;
+          background-color: var(--white);
+        }
+        .navbar-text {
+          color: var(--text-light) !important;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+        }
+        .navbar-nav .btn-outline-light {
+          width: 100%;
+          margin-top: 1rem;
+        }
+      }
+      /* --- AKHIR MODIFIKASI UNTUK MENU HAMBURGER MODERN --- */
+
+      /* Cards */
+      .card {
+        border-radius: 18px; /* Sudut lebih membulat lagi */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Bayangan lebih lembut dan menyebar */
+        border: none;
+        overflow: hidden;
+        background-color: var(--card-bg);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px); /* Efek naik saat hover */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+      .card-header {
+        background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%) !important; /* Gradien pada header card */
+        color: var(--white) !important;
+        font-weight: 600;
+        font-size: 1.3rem;
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+        position: relative;
+        z-index: 1;
+      }
+      .card-header::after {
+        /* Efek gelombang atau pemisah modern */
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 10px; /* Tinggi pemisah */
+        background: var(--card-bg); /* Warna latar belakang card */
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+        transform: translateY(50%);
+        z-index: 0;
+      }
+      .card-body {
+        padding: 2.5rem;
+        background-color: var(--card-bg);
+      }
+
+      /* Buttons */
+      .btn {
+        border-radius: 10px; /* Sudut lebih membulat */
+        font-weight: 600;
+        padding: 0.8rem 1.8rem;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+      .btn::before {
+        /* Efek kilau pada tombol */
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: skewX(-20deg);
+        transition: all 0.4s ease;
+      }
+      .btn:hover::before {
+        left: 100%;
+      }
+      .btn-primary {
+        background: linear-gradient(45deg, var(--accent-blue) 0%, #6a82fb 100%); /* Gradien pada tombol primary */
+        color: var(--white);
+      }
+      .btn-primary:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+      }
+      .btn-outline-light {
+        color: var(--white);
+        border: 2px solid var(--white);
+        background: transparent;
+      }
+      .btn-outline-light:hover {
+        background-color: var(--white);
+        color: var(--accent-blue);
+        border-color: var(--white);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+      }
+      .btn-warning {
+        background: linear-gradient(45deg, var(--accent-orange) 0%, #f7dc6f 100%);
+        color: var(--white);
+      }
+      .btn-warning:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(240, 173, 78, 0.4);
+      }
+      .btn-danger {
+        background: linear-gradient(45deg, var(--accent-red) 0%, #e74c3c 100%);
+        color: var(--white);
+      }
+      .btn-danger:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(217, 83, 79, 0.4);
+      }
+      .btn-info {
+        background: linear-gradient(45deg, var(--accent-blue) 0%, #6a82fb 100%); /* Menggunakan gradien accent-blue untuk info */
+        color: var(--white);
+      }
+      .btn-info:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+      }
+
+      /* Form Controls */
+      .form-control,
+      .form-select {
+        border-radius: 10px;
+        padding: 0.9rem 1.4rem;
+        border: 1px solid var(--border-light);
+        background-color: var(--primary-light); /* Latar belakang input lebih terang */
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05); /* Shadow inset lembut */
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        background-color: var(--white);
+      }
+      .form-text {
+        font-size: 0.8rem;
+        color: #9daab6;
+      }
+
+      /* Status Card */
+      #status-card {
+        transition: all 0.6s ease-in-out; /* Transisi lebih panjang dan halus */
+        position: relative;
+        overflow: hidden;
+      }
+      #status-card::before {
+        /* Efek latar belakang dinamis */
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 0;
+        transform: scale(0);
+        border-radius: 50%;
+        transition: transform 0.5s ease-out;
+      }
+      #status-card:hover::before {
+        transform: scale(1.5);
+      }
+
+      .status-normal .card-header {
+        background: linear-gradient(90deg, var(--accent-green) 0%, #8bc34a 100%) !important;
+      }
+      .status-warning .card-header {
+        background: linear-gradient(90deg, var(--accent-orange) 0%, #ffc107 100%) !important;
+      }
+      .status-alert .card-header {
+        background: linear-gradient(90deg, var(--accent-red) 0%, #dc3545 100%) !important;
+      }
+
+      .status-normal .card-body {
+        color: var(--accent-green) !important;
+      }
+      .status-warning .card-body {
+        color: var(--accent-orange) !important;
+      }
+      .status-alert .card-body {
+        color: var(--accent-red) !important;
+      }
+
+      #status-card .card-body {
+        min-height: 250px; /* Tinggi minimum lebih besar */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      #current-db {
+        font-size: 5.5rem !important; /* Ukuran font sangat besar */
+        font-weight: 800 !important;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        line-height: 1;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      #current-status {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+      #last-updated {
+        font-size: 0.95rem;
+        color: #a0aec0 !important;
+        margin-top: 10px;
+      }
+
+      /* Tables */
+      .table {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        background-color: var(--card-bg);
+      }
+      .table thead th {
+        background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        color: var(--white);
+        font-weight: 600;
+        padding: 1.2rem 1.8rem;
+        border-bottom: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .table tbody tr {
+        transition: background-color 0.2s ease;
+      }
+      .table tbody tr:hover {
+        background-color: rgba(74, 144, 226, 0.08); /* Hover effect yang lebih menonjol */
+      }
+      .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02); /* Striping yang sangat lembut */
+      }
+      .table td,
+      .table th {
+        padding: 1.2rem 1.8rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--border-light);
+      }
+
+      /* Footer */
+      .footer {
+        background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%) !important;
+        color: var(--text-light);
+        padding: 2.5rem 0;
+        margin-top: auto; /* Dorong footer ke bawah */
+        font-size: 0.95rem;
+        box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.2);
+      }
+      .footer a {
+        color: var(--white);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      .footer a:hover {
+        color: var(--primary-light);
+        text-decoration: underline;
+      }
+
+      /* General Spacing */
+      .container {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        flex-grow: 1; /* Memungkinkan konten tumbuh */
+      }
+      section {
+        margin-bottom: 4rem;
+      }
+      h2 {
+        font-weight: 800; /* Lebih tebal */
+        color: var(--primary-dark);
+        margin-bottom: 2rem;
+        text-align: center;
+        font-size: 2.5rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      h3 {
+        font-weight: 700;
+        color: var(--text-dark);
+        font-size: 1.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Deteksi Kebisingan IoT</a>
+        <!-- Tombol Toggler (Menu Burger) -->
+        <!-- Tambahkan style="display: none;" secara default -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" id="navbar-toggler-btn" style="display: none">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Konten Navbar yang akan di-collapse -->
+        <!-- Tambahkan class 'd-none' untuk menyembunyikan secara default di desktop juga, akan di-override oleh Bootstrap di breakpoint 'lg' ke atas -->
+        <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#dashboard">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#historical-data">Data Historis</a>
+            </li>
+            <li class="nav-item" id="settings-nav-item">
+              <!-- Added ID for easy access -->
+              <a class="nav-link" href="#settings">Pengaturan</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#reports">Laporan</a>
+            </li>
+            <!-- Hanya tampil untuk Admin -->
+            <li class="nav-item" id="admin-menu-item" style="display: none">
+              <a class="nav-link" href="#user-management">Manajemen Pengguna</a>
+            </li>
+          </ul>
+          <div class="d-flex">
+            <span class="navbar-text me-3" id="user-info">Selamat Datang, Pengguna!</span>
+            <button class="btn btn-outline-light" id="logout-btn">Logout</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <!-- Login Section -->
+      <section id="login-section" class="mb-5" style="display: block">
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Login</h3>
+              </div>
+              <div class="card-body">
+                <form id="login-form">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username/Email</label>
+                    <input type="text" class="form-control" id="username" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required />
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100">Login</button>
+                  <div id="login-error" class="text-danger mt-2" style="display: none"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Real-Time Monitoring -->
+      <section id="dashboard" class="mb-5" style="display: none">
+        <h2 class="mb-4">Dashboard Real-Time Monitoring</h2>
+        <div class="row">
+          <div class="col-md-8">
+            <div class="card mb-4">
+              <div class="card-header">Intensitas Kebisingan Real-Time</div>
+              <div class="card-body">
+                <canvas id="noiseChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center" id="status-card">
+              <div class="card-header" id="status-header">Status Sistem</div>
+              <div class="card-body">
+                <h3 class="card-title" id="current-status">Memuat...</h3>
+                <p class="card-text fs-1 fw-bold" id="current-db">-- dB</p>
+                <p class="card-text"><small class="text-muted" id="last-updated">Terakhir diperbarui: --</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Historis & Grafik -->
+      <section id="historical-data" class="mb-5" style="display: none">
+        <h2 class="mb-4">Data Historis & Grafik</h2>
+        <div class="card mb-4">
+          <div class="card-header">Filter Data Historis</div>
+          <div class="card-body">
+            <form class="row g-3">
+              <div class="col-md-4">
+                <label for="startDate" class="form-label">Tanggal Mulai</label>
+                <input type="date" class="form-control" id="startDate" />
+              </div>
+              <div class="col-md-4">
+                <label for="endDate" class="form-label">Tanggal Akhir</label>
+                <input type="date" class="form-control" id="endDate" />
+              </div>
+              <div class="col-md-4">
+                <label for="timeRange" class="form-label">Rentang Waktu</label>
+                <select id="timeRange" class="form-select">
+                  <option value="hourly">Per Jam</option>
+                  <option value="daily">Harian</option>
+                  <option value="weekly">Mingguan</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button type="button" class="btn btn-primary" id="filter-history-btn">Tampilkan Data</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">Grafik Tren Kebisingan</div>
+          <div class="card-body">
+            <canvas id="historicalNoiseChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Riwayat Kebisingan</div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Intensitas (dB)</th>
+                    <th>Status</th>
+                    <th>Lokasi Sensor</th>
+                  </tr>
+                </thead>
+                <tbody id="historical-data-table-body">
+                  <!-- Data akan dimuat di sini oleh JavaScript -->
+                  <tr>
+                    <td colspan="4" class="text-center">Tidak ada data untuk ditampilkan.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pengaturan Ambang Batas Kebisingan & Jam Operasional -->
+      <section id="settings" class="mb-5" style="display: none">
+        <h2 class="mb-4">Pengaturan Sistem</h2>
+
+        <!-- Pengaturan Ambang Batas -->
+        <div class="card mb-4">
+          <div class="card-header">Pengaturan Ambang Batas Kebisingan</div>
+          <div class="card-body">
+            <form id="threshold-settings-form">
+              <div class="mb-3">
+                <label for="warningThreshold" class="form-label">Ambang Batas Peringatan (dB)</label>
+                <input type="number" class="form-control" id="warningThreshold" value="78" min="0" max="4095" required />
+                <div class="form-text">Sistem akan memberikan teguran suara jika kebisingan mencapai nilai ini.</div>
+              </div>
+              <div class="mb-3">
+                <label for="alarmThreshold" class="form-label">Ambang Batas Alarm Keras (dB)</label>
+                <input type="number" class="form-control" id="alarmThreshold" value="92" min="0" max="4095" required />
+                <div class="form-text">Sistem akan mengaktifkan alarm keras jika kebisingan mencapai nilai ini.</div>
+              </div>
+              <button type="submit" class="btn btn-warning">Simpan Ambang Batas</button>
+              <div id="threshold-save-status" class="mt-2"></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Pengaturan Jam Operasional -->
+        <div class="card mb-4">
+          <div class="card-header">Pengaturan Jam Operasional</div>
+          <div class="card-body">
+            <form id="operational-settings-form">
+              <div class="mb-3">
+                <label for="operationalStartTime" class="form-label">Waktu Mulai Operasional</label>
+                <input type="time" class="form-control" id="operationalStartTime" value="07:00" required />
+              </div>
+              <div class="mb-3">
+                <label for="operationalEndTime" class="form-label">Waktu Selesai Operasional</label>
+                <input type="time" class="form-control" id="operationalEndTime" value="22:00" required />
+              </div>
+              <button type="submit" class="btn btn-warning">Simpan Jam Operasional</button>
+              <div id="operational-save-status" class="mt-2"></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Pengaturan Notifikasi Otomatis -->
+        <div class="card">
+          <div class="card-header">Pengaturan Notifikasi Otomatis</div>
+          <div class="card-body">
+            <form id="notification-settings-form">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="enableEmailNotifications" checked />
+                <label class="form-check-label" for="enableEmailNotifications"> Aktifkan Notifikasi Email </label>
+              </div>
+              <div class="mb-3">
+                <label for="emailRecipients" class="form-label">Penerima Email (pisahkan dengan koma)</label>
+                <input type="text" class="form-control" id="emailRecipients" value="admin@example.com,dosen@example.com" />
+                <div class="form-text">Daftar alamat email yang akan menerima peringatan.</div>
+              </div>
+              <button type="submit" class="btn btn-warning">Simpan Notifikasi</button>
+              <div id="notification-save-status" class="mt-2"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Manajemen Pengguna (Hanya untuk Admin) -->
+      <section id="user-management" class="mb-5" style="display: none">
+        <h2 class="mb-4">Manajemen Pengguna</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addUserModal">Tambah Pengguna Baru</button>
+
+        <div class="card">
+          <div class="card-header">Daftar Pengguna</div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="user-list-table-body">
+                  <!-- Data pengguna akan dimuat di sini oleh JavaScript -->
+                  <tr>
+                    <td colspan="5" class="text-center">Tidak ada pengguna.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Tambah/Edit Pengguna -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Tambah Pengguna Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="add-user-form">
+                  <div class="mb-3">
+                    <label for="newUsername" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="newUsername" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="newEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="newEmail" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="newPassword" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="newPassword" required />
+                  </div>
+                  <div class="mb-3">
+                    <label for="newUserRole" class="form-label">Role</label>
+                    <select class="form-select" id="newUserRole">
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Simpan Pengguna</button>
+                  <div id="add-user-status" class="mt-2"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Laporan Otomatis (Export Data) -->
+      <section id="reports" class="mb-5" style="display: none">
+        <h2 class="mb-4">Laporan Kebisingan</h2>
+        <div class="card mb-4">
+          <div class="card-header">Filter Laporan</div>
+          <div class="card-body">
+            <form class="row g-3">
+              <div class="col-md-4">
+                <label for="reportStartDate" class="form-label">Tanggal Mulai</label>
+                <input type="date" class="form-control" id="reportStartDate" />
+              </div>
+              <div class="col-md-4">
+                <label for="reportEndDate" class="form-label">Tanggal Akhir</label>
+                <input type="date" class="form-control" id="reportEndDate" />
+              </div>
+              <div class="col-md-4">
+                <label for="reportFormat" class="form-label">Format Laporan</label>
+                <select id="reportFormat" class="form-select">
+                  <option value="excel">Excel (.xlsx)</option>
+                  <option value="pdf">PDF (.pdf)</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button type="button" class="btn btn-info" id="generate-report-btn">Buat & Unduh Laporan</button>
+                <div id="report-status" class="mt-2"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-lg-start mt-5 footer">
+      <div class="text-center p-3">© 2025 Sistem Pendeteksi Kebisingan Kampus - Yensi Clarita Silaen</div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script JavaScript Anda -->
+    <script type="module">
+      // Import fungsi Firebase yang kita butuhkan
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+      import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+      // Konfigurasi Firebase-mu
+      const firebaseConfig = {
+        apiKey: "AIzaSyApPu7Czv_dXNgI38SUxgzHCQFvu7PaQSI", // HATI-HATI JANGAN DISEBAR
+        authDomain: "deteksi-kebisingan-4c0b4.firebaseapp.com",
+        databaseURL: "https://deteksi-kebisingan-4c0b4-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "deteksi-kebisingan-4c0b4",
+        storageBucket: "deteksi-kebisingan-4c0b4.appspot.com",
+        messagingSenderId: "174072989831",
+        appId: "1:174072989831:web:6c1d50c3a37414e94d5022",
+      };
+
+      // Inisialisasi Firebase App
+      const app = initializeApp(firebaseConfig);
+      // Dapatkan referensi ke Realtime Database
+      const database = getDatabase(app);
+
+      // --- Variabel Global ---
+      let currentUser = null; // Menyimpan info user login
+      let noiseChart; // Menyimpan objek chart realtime
+      let historicalNoiseChart; // Menyimpan objek chart historis
+      let currentSettings = { warning: 350, alarm: 1200 }; // Nilai default awal
+
+      // --- Fungsi Utama Setelah DOM Siap ---
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- Referensi Elemen HTML ---
+        const loginSection = document.getElementById("login-section");
+        const dashboardSection = document.getElementById("dashboard");
+        const historicalDataSection = document.getElementById("historical-data");
+        const settingsSection = document.getElementById("settings");
+        const reportsSection = document.getElementById("reports");
+        const userManagementSection = document.getElementById("user-management");
+
+        const navLinks = document.querySelectorAll(".nav-link");
+        const logoutBtn = document.getElementById("logout-btn");
+        const userInfo = document.getElementById("user-info");
+        const adminMenuItem = document.getElementById("admin-menu-item");
+        const navbarNav = document.getElementById("navbarNav");
+        const navbarTogglerBtn = document.getElementById("navbar-toggler-btn");
+        const settingsNavItem = document.getElementById("settings-nav-item");
+
+        const currentStatusElement = document.getElementById("current-status");
+        const currentDbElement = document.getElementById("current-db");
+        const lastUpdatedElement = document.getElementById("last-updated");
+        const statusCard = document.getElementById("status-card");
+
+        // --- Fungsi untuk Menampilkan Section ---
+        function showSection(sectionId) {
+          if (!currentUser && sectionId !== "login-section") {
+            sectionId = "login-section";
+            const loginError = document.getElementById("login-error");
+            if (loginError) {
+              loginError.textContent = "Anda harus login dahulu.";
+              loginError.style.display = "block";
+            }
+          }
+          if (currentUser && currentUser.role === "user" && sectionId === "settings") {
+            alert("Anda tidak punya izin akses Pengaturan.");
+            sectionId = "dashboard";
+          }
+
+          const sections = [loginSection, dashboardSection, historicalDataSection, settingsSection, reportsSection, userManagementSection];
+          sections.forEach((section) => {
+            if (section) section.style.display = "none";
+          });
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) targetSection.style.display = "block";
+
+          // PANGGIL loadSettings() JIKA ADMIN BUKA PENGATURAN
+          if (sectionId === "settings" && currentUser && currentUser.role === "admin") {
+            loadSettings(); // <-- Tambahkan baris ini
+          }
+
+          navLinks.forEach((link) => link.classList.remove("active"));
+          if (currentUser || sectionId === "login-section") {
+            const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+            if (activeLink) activeLink.classList.add("active");
+          }
+          // Render user table (dummy)
+          if (sectionId === "user-management" && currentUser && currentUser.role === "admin") {
+            renderUserTable();
+          }
+        }
+        // --- Fungsi untuk Memuat Pengaturan dari Firebase ---
+        function loadSettings() {
+          console.log("Mencoba memuat pengaturan...");
+          // Baca Ambang Batas (kode ini sudah ada)
+          get(settingsThresholdRef).then(/*...*/);
+
+          // TAMBAHAN: Baca Jam Operasional
+          get(settingsJamRef)
+            .then((snapshot) => {
+              if (snapshot.exists()) {
+                const jam = snapshot.val();
+                console.log("Jam operasional ditemukan:", jam);
+                const startInput = document.getElementById("operationalStartTime");
+                const endInput = document.getElementById("operationalEndTime");
+                // Abaikan break time dulu
+                if (startInput && jam.mulai) startInput.value = jam.mulai;
+                if (endInput && jam.selesai) endInput.value = jam.selesai;
+              } else {
+                console.log("Belum ada data jam operasional.");
+                // Opsional: set default jika belum ada
+                // set(settingsJamRef, { mulai: "07:00", selesai: "22:00" });
+              }
+            })
+            .catch((error) => {
+              console.error("Gagal memuat jam operasional:", error);
+            });
+        }
+
+        // --- Fungsi untuk Mengatur Navigasi (Aktif/Nonaktif) ---
+        function toggleNavigation(enable) {
+          if (navbarTogglerBtn) {
+            navbarTogglerBtn.style.display = enable ? "block" : "none";
+          }
+          if (navbarNav) {
+            if (enable) {
+              navbarNav.classList.remove("d-none");
+              navbarNav.classList.add("d-lg-flex");
+            } else {
+              navbarNav.classList.add("d-none");
+              navbarNav.classList.remove("d-lg-flex");
+              const bsCollapse = bootstrap.Collapse.getInstance(navbarNav);
+              if (bsCollapse) bsCollapse.hide();
+            }
+            navbarNav.classList.toggle("disabled-nav", !enable);
+          }
+          if (adminMenuItem) {
+            adminMenuItem.style.display = enable && currentUser && currentUser.role === "admin" ? "list-item" : "none";
+          }
+          if (settingsNavItem) {
+            if (enable && currentUser && currentUser.role === "user") {
+              settingsNavItem.style.display = "none";
+            } else if (enable && currentUser && currentUser.role === "admin") {
+              settingsNavItem.style.display = "list-item";
+              settingsNavItem.style.pointerEvents = "auto";
+              settingsNavItem.style.opacity = "1";
+            } else if (!enable) {
+              settingsNavItem.style.display = "list-item";
+              settingsNavItem.style.pointerEvents = "none";
+              settingsNavItem.style.opacity = "0.4";
+            }
+          }
+        }
+
+        // --- Event Listener untuk Link Navigasi ---
+        navLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault(); // Selalu cegah default action dulu
+            const sectionId = link.getAttribute("href").substring(1);
+            if (!currentUser && sectionId !== "login-section") {
+              showSection("login-section");
+              const loginError = document.getElementById("login-error");
+              if (loginError) {
+                loginError.textContent = "Anda harus login dahulu.";
+                loginError.style.display = "block";
+              }
+            } else if (currentUser && currentUser.role === "user" && sectionId === "settings") {
+              alert("Anda tidak punya izin akses Pengaturan.");
+              showSection("dashboard");
+            } else {
+              showSection(sectionId);
+              if (window.innerWidth < 992) {
+                const bsCollapse = bootstrap.Collapse.getInstance(navbarNav);
+                if (bsCollapse) bsCollapse.hide();
+              }
+            }
+          });
+        });
+
+        // --- Fungsi Login (Dummy) ---
+        const loginForm = document.getElementById("login-form");
+        if (loginForm) {
+          loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            const loginError = document.getElementById("login-error");
+
+            if (username === "admin" && password === "admin123") {
+              currentUser = { username: "Admin", role: "admin" };
+              userInfo.textContent = `Selamat Datang, ${currentUser.username}!`;
+              toggleNavigation(true);
+              showSection("dashboard");
+              loginError.style.display = "none";
+              usernameInput.value = "";
+              passwordInput.value = "";
+            } else if (username === "user" && password === "user123") {
+              currentUser = { username: "Dosen", role: "user" };
+              userInfo.textContent = `Selamat Datang, ${currentUser.username}!`;
+              toggleNavigation(true);
+              showSection("dashboard");
+              loginError.style.display = "none";
+              usernameInput.value = "";
+              passwordInput.value = "";
+            } else {
+              loginError.textContent = "Username atau password salah.";
+              loginError.style.display = "block";
+            }
+          });
+        }
+
+        // --- Fungsi Logout ---
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", () => {
+            currentUser = null;
+            toggleNavigation(false);
+            userInfo.textContent = "Selamat Datang, Pengguna!";
+            navLinks.forEach((link) => link.classList.remove("active"));
+            showSection("login-section");
+            const dashboardNavLink = document.querySelector('.nav-link[href="#dashboard"]');
+            if (dashboardNavLink) dashboardNavLink.classList.remove("active");
+          });
+        }
+
+        // --- Inisialisasi Grafik (Chart.js) ---
+        const noiseCtx = document.getElementById("noiseChart");
+        if (noiseCtx) {
+          noiseChart = new Chart(noiseCtx, {
+            /* ... Opsi Chart Realtime ... */ type: "line",
+            data: { labels: [], datasets: [{ label: "Kebisingan (Level)", data: [], borderColor: "var(--accent-blue)", backgroundColor: "rgba(74, 144, 226, 0.2)", tension: 0.4, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 500 /* Sesuaikan max */ }, x: {} }, animation: false }, // MAX disesuaikan dengan nilai sensor
+          });
+        }
+        const historicalNoiseCtx = document.getElementById("historicalNoiseChart");
+        if (historicalNoiseCtx) {
+          historicalNoiseChart = new Chart(historicalNoiseCtx, {
+            /* ... Opsi Chart Historis ... */ type: "bar",
+            data: { labels: [], datasets: [{ label: "Rata-rata Kebisingan", data: [], backgroundColor: "var(--accent-blue)" }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 500 /* Sesuaikan max */ }, x: {} } }, // MAX disesuaikan
+          });
+        }
+
+        // --- Fungsi untuk Update Tampilan Dashboard dari Data Firebase ---
+        function updateDashboardUI(dataSensor) {
+          if (!dataSensor || !currentUser || dashboardSection.style.display === "none") return;
+
+          const noiseLevel = dataSensor.noiseLevel || 0; // Ambil noiseLevel, default 0 jika tidak ada
+          const timestamp = dataSensor.timestamp;
+
+          // Ambil ambang batas DARI FIREBASE atau hardcode (nanti diganti)
+          // const warningThreshold = settingsFromFirebase.warning || 350; // Contoh
+          // const alarmThreshold = settingsFromFirebase.alarm || 1200; // Contoh
+          const warningThreshold = currentSettings.warning;
+          const alarmThreshold = currentSettings.alarm;
+
+          let status = "Normal";
+          let cardClass = "status-normal";
+
+          if (noiseLevel >= alarmThreshold) {
+            status = "Peringatan Keras";
+            cardClass = "status-alert";
+          } else if (noiseLevel >= warningThreshold) {
+            status = "Peringatan";
+            cardClass = "status-warning";
+          }
+
+          // Update Elemen Tampilan
+          if (currentStatusElement) currentStatusElement.textContent = status;
+          if (currentDbElement) currentDbElement.textContent = `${noiseLevel}`; // Tampilkan nilai asli
+          if (statusCard) statusCard.className = `card text-center ${cardClass}`;
+
+          if (lastUpdatedElement) {
+            const timeString = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            lastUpdatedElement.textContent = `Terakhir diperbarui: ${timeString}`;
+          }
+
+          // Update Grafik Realtime
+          if (noiseChart) {
+            const maxDataPoints = 20;
+            const now = new Date();
+            const timeString = timestamp ? new Date(timestamp).toLocaleTimeString() : now.toLocaleTimeString();
+
+            noiseChart.data.labels.push(timeString);
+            noiseChart.data.datasets[0].data.push(noiseLevel);
+
+            if (noiseChart.data.labels.length > maxDataPoints) {
+              noiseChart.data.labels.shift();
+              noiseChart.data.datasets[0].data.shift();
+            }
+            noiseChart.update();
+          }
+        }
+
+        // --- Listener Firebase Realtime Database ---
+        // GANTI '/sensor/realtime' dengan path yang benar di database-mu
+        const sensorDataRef = ref(database, "/sensor/realtime");
+
+        onValue(sensorDataRef, (snapshot) => {
+          const data = snapshot.val();
+          console.log("Data Firebase:", data); // Debugging
+          updateDashboardUI(data); // Panggil fungsi update UI
+        });
+
+        // --- Dummy Fungsi Lainnya (Settings, User Management, Reports) ---
+        // (Kode dummy untuk form settings, user management, report tetap di sini)
+        // --- Dummy User Management ---
+        const userListTableBody = document.getElementById("user-list-table-body");
+        const addUserForm = document.getElementById("add-user-form");
+        const addUserModalElement = document.getElementById("addUserModal");
+        let addUserModal;
+        if (addUserModalElement) {
+          addUserModal = new bootstrap.Modal(addUserModalElement);
+        }
+
+        let users = [
+          { id: 1, username: "admin", email: "admin@example.com", role: "admin" },
+          { id: 2, username: "dosen1", email: "dosen1@example.com", role: "user" },
+          { id: 3, username: "kajur", email: "kajur@example.com", role: "user" },
+        ];
+
+        function renderUserTable() {
+          /* ... kode render tabel ... */
+        }
+        if (addUserForm) {
+          addUserForm.addEventListener("submit", (e) => {
+            /* ... kode tambah user dummy ... */
+          });
+        }
+        document.querySelectorAll(".delete-user-btn").forEach((button) => {
+          button.addEventListener("click", (e) => {
+            /* ... kode hapus user dummy ... */
+          });
+        });
+
+        // --- Dummy Report Generation ---
+        const generateReportBtn = document.getElementById("generate-report-btn");
+        if (generateReportBtn) {
+          generateReportBtn.addEventListener("click", () => {
+            /* ... kode report dummy ... */
+          });
+        }
+
+        // --- Dummy Settings Save ---
+        // --- Modifikasi Event Listener untuk Simpan Pengaturan Ambang Batas ---
+        const thresholdSettingsForm = document.getElementById("threshold-settings-form");
+        if (thresholdSettingsForm) {
+          thresholdSettingsForm.addEventListener("submit", (e) => {
+            e.preventDefault(); // Cegah form submit biasa
+            const warningValue = parseInt(document.getElementById("warningThreshold").value);
+            const alarmValue = parseInt(document.getElementById("alarmThreshold").value);
+            const statusElement = document.getElementById("threshold-save-status");
+
+            // Validasi sederhana (pastikan angka)
+            if (isNaN(warningValue) || isNaN(alarmValue)) {
+              statusElement.className = "mt-2 text-danger";
+              statusElement.textContent = "Error: Pastikan input adalah angka.";
+              return;
+            }
+
+            // Tampilkan status "Menyimpan..."
+            statusElement.className = "mt-2 text-info";
+            statusElement.textContent = "Menyimpan pengaturan ke Firebase...";
+
+            // Kirim data ke Firebase menggunakan set()
+            set(settingsThresholdRef, {
+              warning: warningValue,
+              alarm: alarmValue,
+            })
+              .then(() => {
+                // Jika berhasil disimpan
+                currentSettings = { warning: warningValue, alarm: alarmValue };
+                statusElement.className = "mt-2 text-success";
+                statusElement.textContent = "Pengaturan ambang batas berhasil disimpan!";
+                console.log("Pengaturan berhasil disimpan ke Firebase.");
+              })
+              .catch((error) => {
+                // Jika gagal disimpan
+                statusElement.className = "mt-2 text-danger";
+                statusElement.textContent = "Gagal menyimpan pengaturan: " + error.message;
+                console.error("Gagal menyimpan pengaturan:", error);
+              });
+          });
+        }
+        // --- Modifikasi Event Listener untuk Simpan Jam Operasional ---
+        const operationalSettingsForm = document.getElementById("operational-settings-form");
+        if (operationalSettingsForm) {
+          operationalSettingsForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const startTime = document.getElementById("operationalStartTime").value;
+            const endTime = document.getElementById("operationalEndTime").value;
+            // Abaikan break time
+            const statusElement = document.getElementById("operational-save-status");
+
+            // Validasi format sederhana (HH:MM)
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+              statusElement.className = "mt-2 text-danger";
+              statusElement.textContent = "Error: Format waktu harus HH:MM (contoh: 07:00).";
+              return;
+            }
+
+            statusElement.className = "mt-2 text-info";
+            statusElement.textContent = "Menyimpan jam operasional ke Firebase...";
+
+            // Kirim data ke Firebase
+            set(settingsJamRef, {
+              mulai: startTime,
+              selesai: endTime,
+              // Abaikan break time
+            })
+              .then(() => {
+                statusElement.className = "mt-2 text-success";
+                statusElement.textContent = "Jam operasional berhasil disimpan!";
+                console.log("Jam operasional disimpan ke Firebase.");
+              })
+              .catch((error) => {
+                statusElement.className = "mt-2 text-danger";
+                statusElement.textContent = "Gagal menyimpan jam: " + error.message;
+                console.error("Gagal menyimpan jam:", error);
+              });
+          });
+        }
+        const notificationSettingsForm = document.getElementById("notification-settings-form");
+        if (notificationSettingsForm) {
+          notificationSettingsForm.addEventListener("submit", (e) => {
+            /* ... kode simpan notif dummy ... */
+          });
+        }
+
+        // --- Initial State ---
+        showSection("login-section");
+        toggleNavigation(false);
+      });
+
+      const settingsThresholdRef = ref(database, "/pengaturan/ambangBatas");
+      const settingsJamRef = ref(database, "/pengaturan/jamOperasional"); // <-- TAMBAHKAN INI
+    </script>
+  </body>
+</html>
